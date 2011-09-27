@@ -55,8 +55,9 @@ namespace {
 	EmNodeSet path;
 	EmNodeList sequence;
 
-	// run a legacy style calculation
-	pathBuild(inputFlows.begin()->first, graph, path, outputFlows, inputFlows.begin()->second, sequence, 0.0);
+	// run a legacy style calculation with low level method
+	pathBuild(inputFlows.begin()->first, graph, path, outputFlows,
+			  inputFlows.begin()->second, sequence, 0.0);
 	EXPECT_NEAR(75.0, outputFlows["Node3"], 0.0001);
   }
 } // namespace
