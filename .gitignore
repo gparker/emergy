@@ -1,1 +1,5 @@
+*.o
+*.a
+TAGS
+*_unittest
 gtest-svn
