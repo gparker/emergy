@@ -10,7 +10,8 @@ Setup the google test framework in the project directory:
 	svn checkout http://googletest.googlecode.com/svn/trunk/ gtest-svn
 
 Build and run tests:
-    make
+
+	make
 	./emergy_unittest
 
 ## AUTHOR
