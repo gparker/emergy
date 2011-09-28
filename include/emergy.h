@@ -52,6 +52,12 @@ namespace tudor_emergy {
 	EmParams() : savePaths(false), minBranchFlow(0.0) { /* empty */ }
   };
 
+  /// calculate the emergy of a system in graph and populate a run profile
+  /// \param graph a graphical model of the system
+  /// \param params a set of parameters controlling the inputs and the run
+  /// \param profile a set of results and the outputs of the run
+  void calculateEmergy(const EmGraphMap& graph, const EmParams& params, EmCalcProfile& profile);
+
   /// read a graph from a file
   /// \param filename a file with format: parent child branch
   /// \param g an empty graph
@@ -59,11 +65,9 @@ namespace tudor_emergy {
   /// given parent = 1.0
   size_t readGraphFromFile(const string& filename, EmGraphMap& g);
 
-  string doubleToString(double x);
-
+  /// parse a name value pair from a string
+  /// \param s a string in the form "name=value"
   EmNodeValue parseNodeValue(const string& s);
-
-  void calculateEmergy(const EmGraphMap& graph, const EmParams& params, EmCalcProfile& profile);
 }
 
 #endif	// TUDOR_EMERGY_H

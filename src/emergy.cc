@@ -93,4 +93,4 @@ namespace tudor_emergy {
 	for (ENVM_cit cit = inputs.begin(); cit != inputs.end(); cit++)
 	  pathBuild(cit->first, graph, pathSet, profile.outputFlows, cit->second, pathList, params.minBranchFlow * cit->second, profile, params);
   }
-}
+} // tudor_emergy
