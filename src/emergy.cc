@@ -1,4 +1,4 @@
-///
+/// -*- c++ -*-
 /// \file   emergy.cc
 /// \author Gordon Rios
 /// \brief  Basic class for supporting emergy calculations
@@ -16,7 +16,7 @@
 
 namespace tudor_emergy {
 
-  EmCalcProfile::EmCalcProfile() : pathCount(0), pathMaxLen(0), pathMinflowCount(0), pathLoopCount(0), flowLostToMinflow(0.0), flowLostToLoops(0.0) {
+  EmCalcProfile::EmCalcProfile() : pathCount(0), maxBranchFlows(0), pathMinflowCount(0), pathLoopCount(0), flowLostToMinflow(0.0), flowLostToLoops(0.0) {
 	/*empty */
   }
 
@@ -51,17 +51,18 @@ namespace tudor_emergy {
 	return EmNodeValue(name, value);
   }
 
-  // implementation only @TODO clean this up
-  void pathBuild(const string& node, const EmGraphMap& g, EmNodeSet& path, EmNodeValueMap& outputs, double flow, EmNodeList& pathsteps, double minflow, EmCalcProfile& profile, const EmParams& params) {
+  // legacy implementation only @TODO replace with non-recursive version
+  void pathBuild(const string& node, const EmGraphMap& g, EmNodeSet& pathset, EmNodeValueMap& outputs, double flow, EmNodeList& pathlist, double minflow, EmCalcProfile& profile, const EmParams& params) {
 	if (g.find(node) == g.end()) { // no child so aggregate flow
 	  outputs[node] += flow;
-	  if (path.size() > profile.pathMaxLen)
-		profile.pathMaxLen = path.size();
+	  if (pathset.size() > profile.maxBranchFlows)
+		profile.maxBranchFlows = pathset.size();
 	  ++profile.pathCount;
-	  pathsteps.push_back(node);
-	  pathsteps.push_front(doubleToString(flow));
-	  if (params.savePaths)
-		profile.allPaths.push_back(pathsteps);
+	  if (params.savePaths) {
+		pathlist.push_back(node);
+		pathlist.push_front(doubleToString(flow));
+		profile.allPaths.push_back(pathlist);
+	  }
 	}
 	else if (flow < minflow) { // bail out of calculations with too small flow
 	  profile.flowLostToMinflow += flow;
@@ -69,19 +70,20 @@ namespace tudor_emergy {
 	  return;
 	}
 	else {						// update path and recurse
-	  path.insert(node);
-	  pathsteps.push_back(node);
+	  pathset.insert(node);		// update path for recursion
+	  if (params.savePaths)
+		pathlist.push_back(node);
 	  EmGraphMap::const_iterator gcit = g.find(node);
 	  for (EmNodeValueMap::const_iterator cit = gcit->second.begin(); cit != gcit->second.end(); cit++) {
-		if (path.find(cit->first) != path.end()) {
+		if (pathset.find(cit->first) != pathset.end()) {
 		  ++profile.pathLoopCount;
 		  profile.flowLostToLoops += cit->second * flow;
 		}	// end path because it loops back to previous point in its path
 		else {
-		  pathBuild(cit->first, g, path, outputs, cit->second * flow, pathsteps, minflow, profile, params);
+		  pathBuild(cit->first, g, pathset, outputs, cit->second * flow, pathlist, minflow, profile, params);
 		}
 	  }
-	  path.erase(node);
+	  pathset.erase(node);		// return path to previous state
 	}
   }
 

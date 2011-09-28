@@ -1,4 +1,4 @@
-///
+/// -*- c++ -*-
 /// \file   emergy.h
 /// \author Gordon Rios
 /// \brief  Basic class for supporting emergy calculations
@@ -31,20 +31,25 @@ namespace tudor_emergy {
   typedef list<string> EmNodeList;
   typedef list<EmNodeList> EmPathLists;
 
-  /// profile a run of the calculator
+  /// \struct EmCalcProfile 
+  /// \brief profile a run of the calculator
+  /// \note maxBranchFlows = maxPathLen-1
   struct EmCalcProfile {
-	size_t pathCount;		// complete paths examined
-	size_t pathMaxLen;		// longest path encountered
+	size_t pathCount;		/// number of complete paths examined
+	size_t maxBranchFlows;	/// longest sequence of branch steps
 	size_t pathMinflowCount;
 	size_t pathLoopCount;
 	double flowLostToMinflow;
 	double flowLostToLoops;
-	EmPathLists allPaths;		// only populate this if requested in EmParams
+	EmPathLists allPaths;		/// only populate this if requested in EmParams
 	EmNodeValueMap outputFlows;
 	EmCalcProfile();
   };
 
-  /// parameters for a run of the calculator
+  /// \struct EmParams
+  /// \brief parameters for a run of the calculator
+  /// \param minBranchFlow sets a cutoff for whether to branch flow to
+  /// child nodes
   struct EmParams {
 	bool savePaths;				// should all the paths be saved?
 	double minBranchFlow;
@@ -61,6 +66,7 @@ namespace tudor_emergy {
   /// read a graph from a file
   /// \param filename a file with format: parent child branch
   /// \param g an empty graph
+  /// \note
   /// 'branch' is in [0..1] and sum of all child entries for any
   /// given parent = 1.0
   size_t readGraphFromFile(const string& filename, EmGraphMap& g);
