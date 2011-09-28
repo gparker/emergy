@@ -24,29 +24,46 @@ namespace tudor_emergy {
 
   typedef pair<string, double> EmNodeValue;
   typedef map<string, double> EmNodeValueMap;
+  typedef EmNodeValueMap::const_iterator ENVM_cit;
   typedef map<string, EmNodeValueMap> EmGraphMap;
   typedef pair<string, EmNodeValueMap> EmGraphMapEntry;
   typedef set<string> EmNodeSet;
   typedef list<string> EmNodeList;
   typedef list<EmNodeList> EmPathLists;
-  
-  struct EmCalc {
+
+  /// profile a run of the calculator
+  struct EmCalcProfile {
 	size_t pathCount;		// complete paths examined
 	size_t pathMaxLen;		// longest path encountered
 	size_t pathMinflowCount;
 	size_t pathLoopCount;
 	double flowLostToMinflow;
-	double flowLostToCycles;
-	EmCalc();
+	double flowLostToLoops;
+	EmPathLists allPaths;		// only populate this if requested in EmParams
+	EmNodeValueMap outputFlows;
+	EmCalcProfile();
   };
 
+  /// parameters for a run of the calculator
+  struct EmParams {
+	bool savePaths;				// should all the paths be saved?
+	double minBranchFlow;
+	EmNodeValueMap inputFlows;
+	EmParams() : savePaths(false), minBranchFlow(0.0) { /* empty */ }
+  };
+
+  /// read a graph from a file
+  /// \param filename a file with format: parent child branch
+  /// \param g an empty graph
+  /// 'branch' is in [0..1] and sum of all child entries for any
+  /// given parent = 1.0
   size_t readGraphFromFile(const string& filename, EmGraphMap& g);
+
+  string doubleToString(double x);
 
   EmNodeValue parseNodeValue(const string& s);
 
-  void pathBuild(const string& node, const EmGraphMap& g, EmNodeSet& path, EmNodeValueMap& outputs, double flow, EmNodeList& pathsteps, double minflow);
-
-  string doubleToString(double x);
+  void calculateEmergy(const EmGraphMap& graph, const EmParams& params, EmCalcProfile& profile);
 }
 
 #endif	// TUDOR_EMERGY_H

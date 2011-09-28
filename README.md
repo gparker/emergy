@@ -5,11 +5,13 @@ via the modified track summing algorithm developed at Henri Tudor.
 
 ## SETUP
 
-Setup the google test framework:
+Setup the google test framework in the project directory:
 
 	svn checkout http://googletest.googlecode.com/svn/trunk/ gtest-svn
 
-
+Build and run tests:
+    make
+	./emergy_unittest
 
 ## AUTHOR
 

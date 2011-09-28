@@ -1,6 +1,4 @@
-# A sample Makefile for building Google Test and using it in user
-# tests.  Please tweak it to suit your environment and project.  You
-# may want to move it to your project's root directory.
+# Plain vanilla google test Makefile
 #
 # SYNOPSIS:
 #

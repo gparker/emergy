@@ -14,78 +14,83 @@
 
 #include "emergy.h"
 
-using namespace tudor_emergy;
+namespace tudor_emergy {
 
-EmCalc::EmCalc() : pathCount(0), pathMaxLen(0), pathMinflowCount(0),
-				   pathLoopCount(0), flowLostToMinflow(0.0), 
-				   flowLostToCycles(0.0) { /*empty */ }
-
-string tudor_emergy::doubleToString(double x) {
-  std::ostringstream strs;
-  strs << x;
-  return strs.str();
-}
-
-size_t tudor_emergy::readGraphFromFile(const string& filename, EmGraphMap& g) {
-  std::cerr << "reading graph from " << filename << "..." << std::endl;
-  size_t count = 0;
-  string srcNode, dstNode;
-  double value;
-  std::ifstream infile(filename.c_str());
-  assert(infile.is_open());
-  while ((infile >> srcNode) && (infile >> dstNode) && (infile >> value)) {
-	g[srcNode][dstNode] = value;
-	++count;
+  EmCalcProfile::EmCalcProfile() : pathCount(0), pathMaxLen(0), pathMinflowCount(0), pathLoopCount(0), flowLostToMinflow(0.0), flowLostToLoops(0.0) {
+	/*empty */
   }
-  infile.close();
-  std::cerr << "graph: " << filename << std::endl;
-  return count;
-}
 
-// s is a string of name=value format
-EmNodeValue tudor_emergy::parseNodeValue(const string& s) {
-  size_t valuePos = s.find_first_of("=");
-  assert(valuePos < s.size());	// = not found
-  string name = s.substr(0, valuePos);
-  double value = atof(s.substr(valuePos+1, s.size() - valuePos).c_str());
-  return EmNodeValue(name, value);
-}
+  string doubleToString(double x) {
+	std::ostringstream strs;
+	strs << x;
+	return strs.str();
+  }
 
-static size_t pathcount = 0;		// complete paths examined
-static size_t maxpathlen = 0;
-static size_t minflowcount = 0;
-static double minflowflow = 0.0;
-static size_t loopcount = 0;
-static double loopflow = 0.0;
-static EmPathLists allpaths;
-void tudor_emergy::pathBuild(const string& node, const EmGraphMap& g, EmNodeSet& path, EmNodeValueMap& outputs, double flow, EmNodeList& pathsteps, double minflow) {
-  if (g.find(node) == g.end()) { // no child so aggregate flow
-	outputs[node] += flow;
-	if (path.size() > maxpathlen)
-	  maxpathlen = path.size();
-	++pathcount;
-	pathsteps.push_back(node);
-	pathsteps.push_front(doubleToString(flow));
-	allpaths.push_back(pathsteps);
-  }
-  else if (flow < minflow) { // bail out of calculations with too small flow
-	minflowflow += flow;
-	++minflowcount;
-	return;
-  }
-  else {						// update path and recurse
-	path.insert(node);
-	pathsteps.push_back(node);
-	EmGraphMap::const_iterator gcit = g.find(node);
-	for (EmNodeValueMap::const_iterator cit = gcit->second.begin(); cit != gcit->second.end(); cit++) {
-	  if (path.find(cit->first) != path.end()) {
-		++loopcount;
-		loopflow += cit->second * flow;
-	  }	// end path because it loops back to previous point in its path
-	  else {
-		pathBuild(cit->first, g, path, outputs, cit->second * flow, pathsteps, minflow);
-	  }
+  size_t readGraphFromFile(const string& filename, EmGraphMap& g) {
+	std::cerr << "reading graph from " << filename << "..." << std::endl;
+	size_t count = 0;
+	string srcNode, dstNode;
+	double value;
+	std::ifstream infile(filename.c_str());
+	assert(infile.is_open());
+	while ((infile >> srcNode) && (infile >> dstNode) && (infile >> value)) {
+	  g[srcNode][dstNode] = value;
+	  ++count;
 	}
-	path.erase(node);
+	infile.close();
+	std::cerr << "graph: " << filename << std::endl;
+	return count;
+  }
+
+  // s is a string of name=value format
+  EmNodeValue parseNodeValue(const string& s) {
+	size_t valuePos = s.find_first_of("=");
+	assert(valuePos < s.size());	// = not found
+	string name = s.substr(0, valuePos);
+	double value = atof(s.substr(valuePos+1, s.size() - valuePos).c_str());
+	return EmNodeValue(name, value);
+  }
+
+  // implementation only @TODO clean this up
+  void pathBuild(const string& node, const EmGraphMap& g, EmNodeSet& path, EmNodeValueMap& outputs, double flow, EmNodeList& pathsteps, double minflow, EmCalcProfile& profile, const EmParams& params) {
+	if (g.find(node) == g.end()) { // no child so aggregate flow
+	  outputs[node] += flow;
+	  if (path.size() > profile.pathMaxLen)
+		profile.pathMaxLen = path.size();
+	  ++profile.pathCount;
+	  pathsteps.push_back(node);
+	  pathsteps.push_front(doubleToString(flow));
+	  if (params.savePaths)
+		profile.allPaths.push_back(pathsteps);
+	}
+	else if (flow < minflow) { // bail out of calculations with too small flow
+	  profile.flowLostToMinflow += flow;
+	  ++profile.pathMinflowCount;
+	  return;
+	}
+	else {						// update path and recurse
+	  path.insert(node);
+	  pathsteps.push_back(node);
+	  EmGraphMap::const_iterator gcit = g.find(node);
+	  for (EmNodeValueMap::const_iterator cit = gcit->second.begin(); cit != gcit->second.end(); cit++) {
+		if (path.find(cit->first) != path.end()) {
+		  ++profile.pathLoopCount;
+		  profile.flowLostToLoops += cit->second * flow;
+		}	// end path because it loops back to previous point in its path
+		else {
+		  pathBuild(cit->first, g, path, outputs, cit->second * flow, pathsteps, minflow, profile, params);
+		}
+	  }
+	  path.erase(node);
+	}
+  }
+
+  void calculateEmergy(const EmGraphMap& graph, const EmParams& params, EmCalcProfile& profile) {
+  // process all inputs
+	const EmNodeValueMap& inputs = params.inputFlows;
+	EmNodeSet pathSet;
+	EmNodeList pathList;
+	for (ENVM_cit cit = inputs.begin(); cit != inputs.end(); cit++)
+	  pathBuild(cit->first, graph, pathSet, profile.outputFlows, cit->second, pathList, params.minBranchFlow * cit->second, profile, params);
   }
 }
