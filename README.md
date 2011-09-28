@@ -20,7 +20,7 @@ Emergy is discussed in detail in [Wikipedia's entry on Emergy](http://en.wikiped
 
 A paper [Marvuglia, Benetto, Rugani, Rios] [1] presenting the method and algorithm will be presented at Enviroinfo 2011.
 
-  [1]: A scalable implementation of the track summing algorithm for Emergy calculation with Life Cycle Inventory databases
+  [1]: "A scalable implementation of the track summing algorithm for Emergy calculation with Life Cycle Inventory databases"
 
 ## AUTHOR
 
