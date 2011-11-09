@@ -32,7 +32,7 @@ Run the command line calculator from the project directory:
 	output: Y = 7500
 	output: Z = 30000
 	PATHS
-	750	A	D	E	Y	
+	750		A	D	E	Y	
 	3000	A	D	Z	
 	1750	B	D	E	Y	
 	7000	B	D	Z	
