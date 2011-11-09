@@ -91,7 +91,7 @@ namespace {
   //                      N7 --> N8 (minflow)
   //                  |-> N5
   TEST(TudorEmergyTest, LoopsAndMinflow) {
-	// setup graph
+	// setup graph in a sparse fashion and ignore 0.0 entries in the matrix
 	EmGraphMap graph;
 	graph["N1"]["N2"] = 0.40; // [0.40] leaf
 	graph["N1"]["N3"] = 0.60; // (0.60) interior

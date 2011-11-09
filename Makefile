@@ -36,7 +36,7 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 
 # House-keeping build targets.
 
-all : $(TESTS)
+all : $(TESTS) calc_emergy
 
 clean :
 	rm -f $(TESTS) gtest.a gtest_main.a *.o
@@ -72,9 +72,15 @@ gtest_main.a : gtest-all.o gtest_main.o
 emergy.o : $(USER_SRC)/emergy.cc $(USER_INC)/emergy.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_SRC)/emergy.cc
 
-emergy_unittest.o : $(USER_DIR)/emergy_unittest.cc \
-                     $(USER_INC)/emergy.h $(GTEST_HEADERS)
+emergy_unittest.o : $(USER_DIR)/emergy_unittest.cc $(USER_INC)/emergy.h \
+	$(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/emergy_unittest.cc
+
+calc_emergy.o : $(USER_SRC)/calc_emergy.cc $(USER_INC)/emergy.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_SRC)/calc_emergy.cc
 
 emergy_unittest : emergy.o emergy_unittest.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+calc_emergy	: emergy.o calc_emergy.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@

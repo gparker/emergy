@@ -14,6 +14,31 @@ Build and run tests:
 	make
 	./emergy_unittest
 
+## EXAMPLES
+
+Run the command line calculator from the project directory:
+
+	./calc_emergy test-files/odum96-figure6.8.dat 0.0 A=3000 B=7000 	C=20000
+	reading graph from test-files/odum96-figure6.8.dat...
+	graph: test-files/odum96-figure6.8.dat
+	read 9 lines from test-files/odum96-figure6.8.dat
+	read 3 inputs
+	longest path: 4
+	complete paths: 6
+	loop violations: 9
+	flow lost to loop violations: 37500
+	minflow violations: 0
+	flow lost to minflow violations: 0
+	output: Y = 7500
+	output: Z = 30000
+	PATHS
+	750	A	D	E	Y	
+	3000	A	D	Z	
+	1750	B	D	E	Y	
+	7000	B	D	Z	
+	5000	C	A	D	E	Y	
+	20000	C	A	D	Z	
+
 ## REFERENCES
 
 Emergy is discussed in detail in [Wikipedia's entry on Emergy](http://en.wikipedia.org/wiki/Emergy). The basic track summing algorithm and an example is found in [Odum, 1996](http://books.google.com/books?id=j1PHFoVb7rYC&lpg=PA99&ots=0pPQZkP2BF&dq=track%20summing%20odum%201996&pg=PA99#v=onepage&q&f=false).

@@ -30,6 +30,7 @@ namespace tudor_emergy {
   typedef set<string> EmNodeSet;
   typedef list<string> EmNodeList;
   typedef list<EmNodeList> EmPathLists;
+  typedef EmPathLists::const_iterator EPL_cit;
 
   /// \struct EmCalcProfile 
   /// \brief profile a run of the calculator

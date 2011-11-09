@@ -42,7 +42,7 @@ namespace tudor_emergy {
 	return count;
   }
 
-  // s is a string of name=value format
+  // s is a string in 'name=value' format
   EmNodeValue parseNodeValue(const string& s) {
 	size_t valuePos = s.find_first_of("=");
 	assert(valuePos < s.size());	// = not found
@@ -51,8 +51,9 @@ namespace tudor_emergy {
 	return EmNodeValue(name, value);
   }
 
-  // legacy implementation only @TODO replace with non-recursive version
-  void pathBuild(const string& node, const EmGraphMap& g, EmNodeSet& pathset, EmNodeValueMap& outputs, double flow, EmNodeList& pathlist, double minflow, EmCalcProfile& profile, const EmParams& params) {
+  /// legacy implementation only @TODO replace with non-recursive version
+  /// \note pathlist is *NOT* a reference and is passed by value
+  void pathBuild(const string& node, const EmGraphMap& g, EmNodeSet& pathset, EmNodeValueMap& outputs, double flow, EmNodeList pathlist, double minflow, EmCalcProfile& profile, const EmParams& params) {
 	if (g.find(node) == g.end()) { // no child so aggregate flow
 	  outputs[node] += flow;
 	  if (pathset.size() > profile.maxBranchFlows)
