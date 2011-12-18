@@ -16,9 +16,19 @@ Build and run tests:
 
 ## EXAMPLES
 
+The command line calculator (calc_emergy) is a very simple but usable
+example of a tool that uses the emergy library. It takes a process
+graph file in format: NODEA NODEB FLOW where FLOW is a fraction of
+energy leading out from NODEA to NODEB with the fractions summing to
+one.
+
+Here's the usage specification for calc_emergy:
+
+	USAGE: ./calc_emergy <graph file> <flow multiplier=0.0> <input=flow>
+
 Run the command line calculator from the project directory:
 
-	./calc_emergy test-files/odum96-figure6.8.dat 0.0 A=3000 B=7000 	C=20000
+	./calc_emergy test-files/odum96-figure6.8.dat 0.0 A=3000 B=7000 C=20000
 	reading graph from test-files/odum96-figure6.8.dat...
 	graph: test-files/odum96-figure6.8.dat
 	read 9 lines from test-files/odum96-figure6.8.dat
