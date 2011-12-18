@@ -84,3 +84,7 @@ emergy_unittest : emergy.o emergy_unittest.o gtest_main.a
 
 calc_emergy	: emergy.o calc_emergy.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@
+
+tests	: emergy_unittest
+	./emergy_unittest
+	@echo "Ran all $@ ..."

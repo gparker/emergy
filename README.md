@@ -12,7 +12,7 @@ Setup the google test framework in the project directory:
 Build and run tests:
 
 	make
-	./emergy_unittest
+	make tests
 
 ## EXAMPLES
 
