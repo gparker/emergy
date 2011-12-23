@@ -23,7 +23,8 @@ USER_INC = $(USER_DIR)/include
 CPPFLAGS += -I$(GTEST_DIR) -I$(GTEST_DIR)/include -I$(USER_INC)
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra
+#CXXFLAGS += -g -Wall -Wextra
+CXXFLAGS += -O3 -Wall -Wextra
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
@@ -36,7 +37,7 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 
 # House-keeping build targets.
 
-all : $(TESTS) calc_emergy
+all : $(TESTS) calc_emergy emergy_calculator
 
 clean :
 	rm -f $(TESTS) gtest.a gtest_main.a *.o
@@ -76,6 +77,9 @@ emergy_unittest.o : $(USER_DIR)/emergy_unittest.cc $(USER_INC)/emergy.h \
 	$(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/emergy_unittest.cc
 
+emergy_calculator.o : $(USER_SRC)/emergy_calculator.cc $(USER_INC)/emergy.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_SRC)/emergy_calculator.cc
+
 calc_emergy.o : $(USER_SRC)/calc_emergy.cc $(USER_INC)/emergy.h
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_SRC)/calc_emergy.cc
 
@@ -83,6 +87,9 @@ emergy_unittest : emergy.o emergy_unittest.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 calc_emergy	: emergy.o calc_emergy.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@
+
+emergy_calculator : emergy.o emergy_calculator.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@
 
 tests	: emergy_unittest
