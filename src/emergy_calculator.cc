@@ -28,6 +28,7 @@ using tudor_emergy::EmNodeValue;
 void readInputArgsFromFile(const std::string& filename, EmNodeValueMap& inputs) {
   std::cerr << "reading input parameters from " << filename << "..." << std::endl;
   size_t numEntries = 0;
+  double totalInput = 0.0;
   std::string paramStr;
   std::ifstream infile(filename.c_str());
   assert(infile.is_open());
@@ -37,9 +38,12 @@ void readInputArgsFromFile(const std::string& filename, EmNodeValueMap& inputs) 
 	  inputs.insert(newEntry);
 	else
 	  inputs[newEntry.first] += newEntry.second;
+	totalInput += newEntry.second;
 	numEntries++;
   }
-  std::cerr << "processed " << numEntries << " node=flow pairs" << std::endl;
+  std::cerr << "processed " << numEntries << " node=flow pairs "
+			<< "with total input = " << totalInput
+			<< std::endl;
 }
 
 int main(int argc, char **argv) {
