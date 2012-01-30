@@ -16,15 +16,17 @@ Build and run tests:
 
 ## EXAMPLES
 
-The command line calculator (calc_emergy) is a very simple but usable
-example of a tool that uses the emergy library. It takes a process
-graph file in format: NODEA NODEB FLOW where FLOW is a fraction of
-energy leading out from NODEA to NODEB with the fractions summing to
-one.
+The command line calculator is a _very_ simple but usable example of a tool that uses the emergy library.
 
 Here's the usage specification for calc_emergy:
 
-	USAGE: ./calc_emergy <graph file> <flow multiplier=0.0> <input=flow>
+	USAGE: ./calc_emergy <graph file> <flow multiplier=0.0> <node=flow>
+
+It takes a process graph file in format: NODEA NODEB FLOW where FLOW is a fraction of energy leading out from NODEA to NODEB with the fractions summing to one.
+
+Flow multiplier defaults to 0.0 which means that flows are treated exactly and calculations can be very slow with this setting. Start with 0.01 to get a quick calculation done as a first pass. Getopt is not used so you have to specify something.
+
+Input flows in the form of `node=flow` refer how much total flow is input to `node` (e.g. `N3=10.0`). The nodes are assumed unique so multiple flows to a single input should be summed prior to using the command.
 
 Run the command line calculator from the project directory:
 

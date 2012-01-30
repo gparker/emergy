@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
   using tudor_emergy::EmCalcProfile;
 
   if (argc < 3) {
-	std::cerr << "USAGE: " << argv[0] << " <graph file> <flow multiplier=0.0> <input=flow>" << std::endl; 
+	std::cerr << "USAGE: " << argv[0] << " <graph file> <flow multiplier=0.0> <node=flow>" << std::endl; 
 	exit(1);
   }
 
