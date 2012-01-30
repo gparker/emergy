@@ -16,9 +16,11 @@ Build and run tests:
 
 ## EXAMPLES
 
-The command line calculator is a _very_ simple but usable example of a tool that uses the emergy library.
+### calc_emergy
 
-Here's the usage specification for calc_emergy:
+The first command line calculator is a _very_ simple but usable example of a tool that uses the emergy library.
+
+Here's the usage specification for `calc_emergy`:
 
 	USAGE: ./calc_emergy <graph file> <flow multiplier=0.0> <node=flow>
 
@@ -30,26 +32,64 @@ Input flows in the form of `node=flow` refer how much total flow is input to `no
 
 Run the command line calculator from the project directory:
 
-	./calc_emergy test-files/odum96-figure6.8.dat 0.0 A=3000 B=7000 C=20000
-	reading graph from test-files/odum96-figure6.8.dat...
-	graph: test-files/odum96-figure6.8.dat
-	read 9 lines from test-files/odum96-figure6.8.dat
-	read 3 inputs
-	longest path: 4
-	complete paths: 6
-	loop violations: 9
-	flow lost to loop violations: 37500
-	minflow violations: 0
-	flow lost to minflow violations: 0
-	output: Y = 7500
-	output: Z = 30000
-	PATHS
-	750		A	D	E	Y	
-	3000	A	D	Z	
-	1750	B	D	E	Y	
-	7000	B	D	Z	
-	5000	C	A	D	E	Y	
-	20000	C	A	D	Z	
+```
+./calc_emergy test-files/odum96-figure6.8.graph.dat 0.0 A=3000 B=7000 C=20000
+reading graph from test-files/odum96-figure6.8.graph.dat...
+graph: test-files/odum96-figure6.8.graph.dat
+read 9 lines from test-files/odum96-figure6.8.graph.dat
+read 3 inputs
+longest path: 4
+complete paths: 6
+loop violations: 9
+flow lost to loop violations: 37500
+minflow violations: 0
+flow lost to minflow violations: 0
+output: Y = 7500
+output: Z = 30000
+PATHS
+750	A	D	E	Y	
+3000	A	D	Z	
+1750	B	D	E	Y	
+7000	B	D	Z	
+5000	C	A	D	E	Y	
+20000	C	A	D	Z	
+```
+
+### emergy_calculator
+
+The next example is uses the slightly more sophisticated calculator and has been used for research publications see for example [1]. It uses a file to store inputs (either inline or one input per line) in the same `node=value` format but sums up nonunique entries into total inputs.
+
+Here's the usage specification for `emergy_calculator`:
+
+```USAGE: ./emergy_calculator <graph file> <input file> [flow multiplier=0.0]```
+
+Using an input file with *inline* format:
+
+```
+cat test-files/odum96-figure6.8.inputs.dat
+A=1000 A=2000 B=3000 B=4000 C=10000 C=10000
+```
+
+We can run the calculator on the same data as the previous example:
+
+```
+./emergy_calculator test-files/odum96-figure6.8.graph.dat test-files/odum96-figure6.8.inputs.dat 
+reading graph from test-files/odum96-figure6.8.graph.dat...
+graph: test-files/odum96-figure6.8.graph.dat
+read 9 lines from test-files/odum96-figure6.8.graph.dat
+reading input parameters from test-files/odum96-figure6.8.inputs.dat...
+processed 6 node=flow pairs with total input = 30000
+minFlow = 0
+found 3 unique inputs
+longest path: 4
+complete paths: 6
+loop violations: 9
+flow lost to loop violations: 37500
+minflow violations: 0
+flow lost to minflow violations: 0
+output: Y = 7500
+output: Z = 30000
+```
 
 ## REFERENCES
 

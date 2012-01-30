@@ -40,7 +40,7 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 all : $(TESTS) calc_emergy emergy_calculator
 
 clean :
-	rm -f $(TESTS) gtest.a gtest_main.a *.o
+	rm -f $(TESTS) gtest.a gtest_main.a *.o calc_emergy emergy_calculator
 
 # Builds gtest.a and gtest_main.a.
 
