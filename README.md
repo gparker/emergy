@@ -24,11 +24,11 @@ Here's the usage specification for `calc_emergy`:
 
 	USAGE: ./calc_emergy <graph file> <flow multiplier=0.0> <node=flow>
 
-It takes a process graph file in format: NODEA NODEB FLOW where FLOW is a fraction of energy leading out from NODEA to NODEB with the fractions summing to one.
+It takes a process graph file in format: NODEA NODEB FLOW where FLOW is a *multiplier* of energy (_TBD: conditions on these outflows_) leading out from NODEA to NODEB.
 
 Flow multiplier defaults to 0.0 which means that flows are treated exactly and calculations can be very slow with this setting. Start with 0.01 to get a quick calculation done as a first pass. Getopt is not used so you have to specify something.
 
-Input flows in the form of `node=flow` refer how much total flow is input to `node` (e.g. `N3=10.0`). The nodes are assumed unique so multiple flows to a single input should be summed prior to using the command.
+Input flows in the form of `node=flow` refer how much total flow is input to `node` (e.g. `N3=10.0`). The nodes are assumed unique so multiple flows to a single input should be summed prior to using the command. SEE BELOW: `emergy_calculator` accepts raw flows and then sums them prior to running the calculation.
 
 Run the command line calculator from the project directory:
 

@@ -15,6 +15,7 @@
 #include "emergy.h"
 
 namespace tudor_emergy {
+  const double GRAPH_SUM_MAX = 1.001; // tolerance for graph flow violations
 
   EmCalcProfile::EmCalcProfile() : pathCount(0), maxBranchFlows(0), pathMinflowCount(0), pathLoopCount(0), flowLostToMinflow(0.0), flowLostToLoops(0.0) {
 	/*empty */
@@ -40,6 +41,28 @@ namespace tudor_emergy {
 	infile.close();
 	std::cerr << "graph: " << filename << std::endl;
 	return count;
+  }
+
+  // read inputs and accumulate to previous entry
+  void readInputArgsFromFile(const std::string& filename, EmNodeValueMap& inputs) {
+	std::cerr << "reading input parameters from " << filename << "..." << std::endl;
+	size_t numEntries = 0;
+	double totalInput = 0.0;
+	std::string paramStr;
+	std::ifstream infile(filename.c_str());
+	assert(infile.is_open());
+	while ((infile >> paramStr)) {
+	  EmNodeValue newEntry = parseNodeValue(paramStr); // @TODO: error checking
+	  if (inputs.find(newEntry.first) == inputs.end())
+		inputs.insert(newEntry);
+	  else
+		inputs[newEntry.first] += newEntry.second;
+	  totalInput += newEntry.second;
+	  numEntries++;
+	}
+	std::cerr << "processed " << numEntries << " node=flow pairs "
+			  << "with total input = " << totalInput
+			  << std::endl;
   }
 
   // s is a string in 'name=value' format

@@ -4,7 +4,8 @@
 /// \brief  New calculator to use tudor_emergy library.
 ///
 /// Copyright (c) 2011, Gordon Rios. All rights reserved.
-/// Distributed under the Simplified BSD License. See COPYING.
+/// Distributed under the Simplified BSD License.
+/// See https://github.com/gparker/emergy/blob/master/COPYING.
 ///
 
 #include <iostream>
@@ -18,33 +19,12 @@ using tudor_emergy::EmNodeList;
 using tudor_emergy::ENVM_cit;
 using tudor_emergy::EmGraphMap;
 using tudor_emergy::readGraphFromFile;
+using tudor_emergy::readInputArgsFromFile;
 using tudor_emergy::parseNodeValue;
 using tudor_emergy::EmParams;
 using tudor_emergy::EmCalcProfile;
 using tudor_emergy::parseNodeValue;
 using tudor_emergy::EmNodeValue;
-
-// read inputs and accumulate to previous entry
-void readInputArgsFromFile(const std::string& filename, EmNodeValueMap& inputs) {
-  std::cerr << "reading input parameters from " << filename << "..." << std::endl;
-  size_t numEntries = 0;
-  double totalInput = 0.0;
-  std::string paramStr;
-  std::ifstream infile(filename.c_str());
-  assert(infile.is_open());
-  while ((infile >> paramStr)) {
-	EmNodeValue newEntry = parseNodeValue(paramStr); // @TODO: error checking
-	if (inputs.find(newEntry.first) == inputs.end())
-	  inputs.insert(newEntry);
-	else
-	  inputs[newEntry.first] += newEntry.second;
-	totalInput += newEntry.second;
-	numEntries++;
-  }
-  std::cerr << "processed " << numEntries << " node=flow pairs "
-			<< "with total input = " << totalInput
-			<< std::endl;
-}
 
 int main(int argc, char **argv) {
 

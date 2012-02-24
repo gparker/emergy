@@ -28,7 +28,7 @@ namespace {
 	outputFlows.insert(EmNodeValue("N1", 2000.0));
 	outputFlows["N2"] = 3000.0;
 
-	// can also use this for branch proportions (should sum to 1.0)
+	// can also use this for branch outflows
 	EmNodeValueMap graphNode;
 	graphNode["N1"] = 0.10;
 	graphNode["N2"] = 0.40;

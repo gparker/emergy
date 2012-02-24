@@ -67,10 +67,12 @@ namespace tudor_emergy {
   /// read a graph from a file
   /// \param filename a file with format: parent child branch
   /// \param g an empty graph
-  /// \note
-  /// 'branch' is in [0..1] and sum of all child entries for any
-  /// given parent = 1.0
   size_t readGraphFromFile(const string& filename, EmGraphMap& g);
+
+  /// read a series of node=value inputs from a file
+  /// \param filename a file with format: parent child branch
+  /// \param inputs are a unique mapping of nodes to input flows
+  void readInputArgsFromFile(const std::string& filename, EmNodeValueMap& inputs);
 
   /// parse a name value pair from a string
   /// \param s a string in the form "name=value"
