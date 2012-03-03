@@ -30,16 +30,29 @@ namespace tudor_emergy {
   size_t readGraphFromFile(const string& filename, EmGraphMap& g) {
 	std::cerr << "reading graph from " << filename << "..." << std::endl;
 	size_t count = 0;
+	size_t num_errors = 0; 		// error out if this is > 0 at the end
 	string srcNode, dstNode;
 	double value;
 	std::ifstream infile(filename.c_str());
 	assert(infile.is_open());
 	while ((infile >> srcNode) && (infile >> dstNode) && (infile >> value)) {
+	  if (value < 0.0 || value > 1.0) {
+		std::cerr << "ERROR: " << srcNode << " -> " << dstNode
+				  << " split " << value << " not in [0,1.0]" << std::endl;
+		num_errors++;
+	  } else if (value == 0.0)
+		std::cerr << "WARN: "  << srcNode << " -> " << dstNode
+				  << " split " << value << " tests equal to 0.0" << std::endl;
 	  g[srcNode][dstNode] = value;
 	  ++count;
 	}
 	infile.close();
 	std::cerr << "graph: " << filename << std::endl;
+	if (num_errors > 0) {
+	  std::cerr << "FATAL: Found " << num_errors << " graph errors, exiting..."
+				<< std::endl;
+	  exit(1);
+	}
 	return count;
   }
 

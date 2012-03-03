@@ -14,6 +14,10 @@ Build and run tests:
 	make
 	make tests
 
+Run the calculator on test files:
+	
+	make odum-test
+
 ## EXAMPLES
 
 ### calc_emergy
@@ -24,7 +28,7 @@ Here's the usage specification for `calc_emergy`:
 
 	USAGE: ./calc_emergy <graph file> <flow multiplier=0.0> <node=flow>
 
-It takes a process graph file in format: NODEA NODEB FLOW where FLOW is a *multiplier* of energy (_TBD: conditions on these outflows_) leading out from NODEA to NODEB.
+It takes a process graph file in format: NODEA NODEB FLOW where FLOW is a *multiplier* of emergy that _is greater than 0.0 and less than or equal to 1.0_ leading out from NODEA to NODEB.
 
 Flow multiplier defaults to 0.0 which means that flows are treated exactly and calculations can be very slow with this setting. Start with 0.01 to get a quick calculation done as a first pass. Getopt is not used so you have to specify something.
 

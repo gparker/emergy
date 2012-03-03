@@ -65,6 +65,7 @@ namespace tudor_emergy {
   void calculateEmergy(const EmGraphMap& graph, const EmParams& params, EmCalcProfile& profile);
 
   /// read a graph from a file
+  /// \brief read the graph in form N1 N2 split in [0.0, 1.0]
   /// \param filename a file with format: parent child branch
   /// \param g an empty graph
   size_t readGraphFromFile(const string& filename, EmGraphMap& g);
