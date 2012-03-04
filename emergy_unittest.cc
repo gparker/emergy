@@ -108,7 +108,7 @@ namespace {
 	params.savePaths = false;
 	params.minBranchFlow = 0.01; // thresholding loses N1->N3->N6->N7 (0.006)
 
-	// input of 1.0 produces branch probabilities as outputs
+	// input of 1.0 produces branch flow weights as outputs
 	params.inputFlows.insert(parseNodeValue("N1=1.0"));
 	
 	// this structure saves off results
@@ -126,6 +126,7 @@ namespace {
 	EXPECT_NEAR(0.40, profile.outputFlows["N2"], 0.0001);
 	EXPECT_NEAR(0.324, profile.outputFlows["N5"], 0.0001);
 	EXPECT_TRUE(profile.allPaths.empty());
+	EXPECT_EQ(1u, profile.inputOutputFlows.size());
   }
 } // namespace
 

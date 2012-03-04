@@ -26,6 +26,7 @@ namespace tudor_emergy {
   typedef map<string, double> EmNodeValueMap;
   typedef EmNodeValueMap::const_iterator ENVM_cit;
   typedef map<string, EmNodeValueMap> EmGraphMap;
+  typedef EmGraphMap::const_iterator EGM_cit;
   typedef pair<string, EmNodeValueMap> EmGraphMapEntry;
   typedef set<string> EmNodeSet;
   typedef list<string> EmNodeList;
@@ -44,6 +45,7 @@ namespace tudor_emergy {
 	double flowLostToLoops;
 	EmPathLists allPaths;		/// only populate this if requested in EmParams
 	EmNodeValueMap outputFlows;
+	EmGraphMap inputOutputFlows; /// [input => (output=value)]
 	EmCalcProfile();
   };
 

@@ -125,11 +125,26 @@ namespace tudor_emergy {
   }
 
   void calculateEmergy(const EmGraphMap& graph, const EmParams& params, EmCalcProfile& profile) {
-  // process all inputs
+	// process all inputs
 	const EmNodeValueMap& inputs = params.inputFlows;
+	EmGraphMap& inputOutputs = profile.inputOutputFlows;
 	EmNodeSet pathSet;
 	EmNodeList pathList;
-	for (ENVM_cit cit = inputs.begin(); cit != inputs.end(); cit++)
-	  pathBuild(cit->first, graph, pathSet, profile.outputFlows, cit->second, pathList, params.minBranchFlow * cit->second, profile, params);
+	for (ENVM_cit cit = inputs.begin(); cit != inputs.end(); cit++) {
+	  EmNodeValueMap outputMap;
+	  // pathBuild(cit->first, graph, pathSet, profile.outputFlows, cit->second, pathList, params.minBranchFlow * cit->second, profile, params);
+	  pathBuild(cit->first, graph, pathSet, outputMap, cit->second, pathList, params.minBranchFlow * cit->second, profile, params);
+	  inputOutputs.insert(EmGraphMapEntry(cit->first, outputMap));
+	}
+
+	// now aggregate all the input-output flows
+	EmNodeValueMap& outputs = profile.outputFlows;
+	for (EGM_cit cit = inputOutputs.begin(); cit != inputOutputs.end(); cit++)
+	  for (ENVM_cit mcit = cit->second.begin(); mcit != cit->second.end(); mcit++) {
+		if (outputs.find(mcit->first) == outputs.end())
+		  outputs.insert(*mcit);
+		else
+		  outputs[mcit->first] += mcit->second;
+	  }
   }
 } // tudor_emergy
