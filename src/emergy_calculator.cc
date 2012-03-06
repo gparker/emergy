@@ -48,11 +48,11 @@ int main(int argc, char **argv) {
   // setup parameters
   EmParams params;
   params.savePaths = false;
-  if (argc == 4)
+  if (argc > 3)
 	params.minBranchFlow = atof(argv[3]);
 
   // get last parameter
-  if (argc == 5)
+  if (argc > 4)
 	if (std::string(argv[4]) == "--print-sources") {
 	  params.printSources = true;
 	} else {
@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
 	for (EGM_cit cit = profile.inputOutputFlows.begin(); cit != profile.inputOutputFlows.end(); cit++) {
 	  printf("%s", cit->first.c_str());
 	  for (ENVM_cit mcit = cit->second.begin(); mcit != cit->second.end(); mcit++)
-		printf("\t%s=%.2f", mcit->first.c_str(), mcit->second);
+		printf("\t%s=%.4f", mcit->first.c_str(), mcit->second);
 	  printf("\n");
 	}
   }
