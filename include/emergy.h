@@ -55,9 +55,10 @@ namespace tudor_emergy {
   /// child nodes
   struct EmParams {
 	bool savePaths;				// should all the paths be saved?
+	bool printSources;			// should sources be printed for each output?
 	double minBranchFlow;
 	EmNodeValueMap inputFlows;
-	EmParams() : savePaths(false), minBranchFlow(0.0) { /* empty */ }
+	EmParams() : savePaths(false), printSources(false), minBranchFlow(0.0) { /* empty */ }
   };
 
   /// calculate the emergy of a system in graph and populate a run profile
