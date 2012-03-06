@@ -65,7 +65,7 @@ The next example is uses the slightly more sophisticated calculator and has been
 
 Here's the usage specification for `emergy_calculator`:
 
-```USAGE: ./emergy_calculator <graph file> <input file> [flow multiplier=0.0]```
+```USAGE: ./emergy_calculator <graph file> <input file> [flow multiplier=0.0] [--print-source]```
 
 Using an input file with *inline* format:
 
@@ -77,7 +77,8 @@ A=1000 A=2000 B=3000 B=4000 C=10000 C=10000
 We can run the calculator on the same data as the previous example:
 
 ```
-./emergy_calculator test-files/odum96-figure6.8.graph.dat test-files/odum96-figure6.8.inputs.dat 
+./emergy_calculator test-files/odum96-figure6.8.graph.dat test-files/odum96-figure6.8.inputs.dat 0.0 --print-sources
+
 reading graph from test-files/odum96-figure6.8.graph.dat...
 graph: test-files/odum96-figure6.8.graph.dat
 read 9 lines from test-files/odum96-figure6.8.graph.dat
@@ -85,14 +86,23 @@ reading input parameters from test-files/odum96-figure6.8.inputs.dat...
 processed 6 node=flow pairs with total input = 30000
 minFlow = 0
 found 3 unique inputs
+
+STATISTICS:
 longest path: 4
 complete paths: 6
 loop violations: 9
 flow lost to loop violations: 37500
 minflow violations: 0
 flow lost to minflow violations: 0
+
+OUTPUTS:
 output: Y = 7500
 output: Z = 30000
+
+OUTPUT BY SOURCE:
+A	Y=750.00	Z=3000.00
+B	Y=1750.00	Z=7000.00
+C	Y=5000.00	Z=20000.00
 ```
 
 ## REFERENCES
