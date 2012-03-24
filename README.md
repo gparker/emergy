@@ -14,7 +14,7 @@ Build and run tests:
 	make
 	make tests
 
-Run the calculator on test files:
+Run the calculator on test files in which we've broken up the inputs into different entries for each source in order to test aggregation:
 	
 	make odum-test
 
