@@ -67,7 +67,7 @@ Here's the usage specification for `emergy_calculator`:
 
 ```USAGE: ./emergy_calculator <graph file> <input file> [flow multiplier=0.0] [--print-source]```
 
-Using an input file with *inline* format:
+Using an input file with *inline* format (multiple flows for each input from the source article to test aggregation):
 
 ```
 cat test-files/odum96-figure6.8.inputs.dat
