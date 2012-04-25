@@ -78,6 +78,32 @@ namespace tudor_emergy {
 			  << std::endl;
   }
 
+  // read a set of sourced inputs e.g. S1 N3=1002 N4=10.4
+  void readSourcedInputsFromFile(const std::string& filename, EmGraphMap& sourceinputs) {
+	std::string paramStr;
+	std::string sourceStr;
+	std::ifstream infile(filename.c_str());
+	assert(infile.is_open());
+	std::string line;
+	while (infile.good()) {
+	  getline (infile, line);
+	  if (line.find_first_of("=") == string::npos)
+		continue;
+	  std::stringstream ss(line);
+	  ss >> sourceStr;
+	  EmNodeValueMap inputs;
+	  while (ss >> paramStr) {
+		EmNodeValue newEntry = parseNodeValue(paramStr);
+		if (inputs.find(newEntry.first) == inputs.end())
+		  inputs.insert(newEntry);
+		else
+		  inputs[newEntry.first] += newEntry.second;
+	  }
+	  std::cerr << "Source: " << sourceStr << " had " << inputs.size() << " inputs" << std::endl;
+	  sourceinputs.insert(EmGraphMapEntry(sourceStr, inputs));
+	}
+  }
+
   // s is a string in 'name=value' format
   EmNodeValue parseNodeValue(const string& s) {
 	size_t valuePos = s.find_first_of("=");
@@ -124,6 +150,35 @@ namespace tudor_emergy {
 	}
   }
 
+  void calculateEmergyWithSources(const EmGraphMap& graph, const EmParams& params, EmCalcProfile& profile) {
+	// get the sourced inputFlows
+	const EmGraphMap& sourceInputs = params.sourceInputFlows;
+	EmGraphMap& inputOutputs = profile.inputOutputFlows;
+	for (EGM_cit scit = sourceInputs.begin(); scit != sourceInputs.end(); scit++) {
+
+	  // process all inputs
+	  const EmNodeValueMap& inputs = scit->second;
+
+	  EmNodeSet pathSet;
+	  EmNodeList pathList;
+	  for (ENVM_cit cit = inputs.begin(); cit != inputs.end(); cit++) {
+		EmNodeValueMap outputMap;
+		pathBuild(cit->first, graph, pathSet, outputMap, cit->second, pathList, params.minBranchFlow * cit->second, profile, params);
+		inputOutputs.insert(EmGraphMapEntry(scit->first, outputMap));
+	  }
+	}
+
+	// now aggregate all the input-output flows
+	EmNodeValueMap& outputs = profile.outputFlows;
+	for (EGM_cit cit = inputOutputs.begin(); cit != inputOutputs.end(); cit++)
+	  for (ENVM_cit mcit = cit->second.begin(); mcit != cit->second.end(); mcit++) {
+		if (outputs.find(mcit->first) == outputs.end())
+		  outputs.insert(*mcit);
+		else
+		  outputs[mcit->first] += mcit->second;
+	  }
+  }
+
   void calculateEmergy(const EmGraphMap& graph, const EmParams& params, EmCalcProfile& profile) {
 	// process all inputs
 	const EmNodeValueMap& inputs = params.inputFlows;
@@ -132,7 +187,6 @@ namespace tudor_emergy {
 	EmNodeList pathList;
 	for (ENVM_cit cit = inputs.begin(); cit != inputs.end(); cit++) {
 	  EmNodeValueMap outputMap;
-	  // pathBuild(cit->first, graph, pathSet, profile.outputFlows, cit->second, pathList, params.minBranchFlow * cit->second, profile, params);
 	  pathBuild(cit->first, graph, pathSet, outputMap, cit->second, pathList, params.minBranchFlow * cit->second, profile, params);
 	  inputOutputs.insert(EmGraphMapEntry(cit->first, outputMap));
 	}

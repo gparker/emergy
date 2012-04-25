@@ -12,6 +12,11 @@
 #include <fstream>
 #include <string>
 #include <cassert>
+
+//#include <cstdlib>
+
+#include <unistd.h>
+
 #include "emergy.h"
 
 using tudor_emergy::EmNodeValueMap;
@@ -20,52 +25,84 @@ using tudor_emergy::ENVM_cit;
 using tudor_emergy::EmGraphMap;
 using tudor_emergy::readGraphFromFile;
 using tudor_emergy::readInputArgsFromFile;
+using tudor_emergy::readSourcedInputsFromFile;
 using tudor_emergy::parseNodeValue;
 using tudor_emergy::EmParams;
 using tudor_emergy::EmCalcProfile;
 using tudor_emergy::parseNodeValue;
 using tudor_emergy::EmNodeValue;
-
+using tudor_emergy::EmGraphMapEntry;
 void print_usage(const char* progname) {
-	std::cerr << "USAGE: " << progname << " <graph file> <input file> [flow multiplier=0.0] [--print-sources]" << std::endl; 
+	std::cerr << "USAGE: " << progname << " -g <graph file> -i <input file> -m [flow multiplier=0.0] -p[rint sources]" << std::endl; 
 }
 
 int main(int argc, char **argv) {
 
-  // check basic arg structure
-  if (argc < 3) {
+  std::string graphFilename = "None";
+  std::string inputFilename = "None";
+
+  // setup parameters
+  EmParams params;
+  params.savePaths = false;
+
+  int c = -1;
+  opterr = 0;
+  while ((c = getopt(argc, argv, "+g:i:m:ph")) != -1) {
+	switch(c) {
+	case 'h':
+	  print_usage(argv[0]);
+	  exit(0);
+	  break;
+	case 'g':
+	  graphFilename = std::string(optarg);
+	  break;
+	case 'i':
+	  inputFilename = std::string(optarg);
+	  break;
+	case 'm':
+	  params.minBranchFlow = atof(optarg);
+	  break;
+	case 'p':
+	  params.printSources = true;
+	  break;
+	case '?':
+	  if (optopt == 'c')
+		std::cerr << "Option -" << optopt << " requires an argument" << std::endl;
+	  else
+		std::cerr << "Unknown option -" << optopt << std::endl;
+	  return 1;
+	default:
+	  abort();
+	}
+  }
+
+  // find garbage parameters
+  for (int index = optind; index < argc; index++)
+	std::cerr << "Warn: non-option argument " << argv[index] << std::endl;
+
+  // bail if filenames not found
+  if (graphFilename == "None" || inputFilename == "None") {
 	print_usage(argv[0]);
-	exit(1);
+	exit(2);
   }
 
   // read graph
-  std::string graphFilename = argv[1];
   EmGraphMap graph;
   std::cout << std::endl;
   std::cout << "read " << readGraphFromFile(graphFilename, graph)
 	   << " lines from " << graphFilename << std::endl;
 
-  // setup parameters
-  EmParams params;
-  params.savePaths = false;
-  if (argc > 3)
-	params.minBranchFlow = atof(argv[3]);
-
-  // get last parameter
-  if (argc > 4)
-	if (std::string(argv[4]) == "--print-sources") {
-	  params.printSources = true;
-	} else {
-	  std::cerr << "ERROR: unrecognized arg '" << argv[4] << "'" << std::endl;
-	  print_usage(argv[0]);
-	  exit(1);
-	}
-
   // read inputs node=flow
-  readInputArgsFromFile(argv[2], params.inputFlows);
+  if (params.printSources == false) {
+	EmNodeValueMap inputFlows;
+	readInputArgsFromFile(inputFilename, inputFlows);
+	params.sourceInputFlows.insert(EmGraphMapEntry("ALL", inputFlows));
+  }
+  else
+  	readSourcedInputsFromFile(inputFilename, params.sourceInputFlows);
 
   // bail out if no inputs
-  if (params.inputFlows.empty()) {
+  if (params.sourceInputFlows.empty()) {
 	std::cerr << "error: must specify at least input in node=flow form" << std::endl;
 	exit(1);
   }
@@ -78,7 +115,7 @@ int main(int argc, char **argv) {
   EmCalcProfile profile;
   
   // run the calculator
-  calculateEmergy(graph, params, profile);
+  calculateEmergyWithSources(graph, params, profile);
 
   // dump number of paths examined
   std::cout << std::endl << "STATISTICS:" << std::endl;
@@ -105,7 +142,7 @@ int main(int argc, char **argv) {
 	}
   }
 
-  // print out the sources of variation
+  // print out the sources of emergy
   using tudor_emergy::EGM_cit;
   if (params.printSources) {
 	std::cout << std::endl << "OUTPUT BY SOURCE:" << std::endl;

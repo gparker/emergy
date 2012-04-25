@@ -57,6 +57,7 @@ namespace tudor_emergy {
 	bool savePaths;				// should all the paths be saved?
 	bool printSources;			// should sources be printed for each output?
 	double minBranchFlow;
+	EmGraphMap sourceInputFlows; /// [source => (input=value)]
 	EmNodeValueMap inputFlows;
 	EmParams() : savePaths(false), printSources(false), minBranchFlow(0.0) { /* empty */ }
   };
@@ -66,6 +67,8 @@ namespace tudor_emergy {
   /// \param params a set of parameters controlling the inputs and the run
   /// \param profile a set of results and the outputs of the run
   void calculateEmergy(const EmGraphMap& graph, const EmParams& params, EmCalcProfile& profile);
+
+  void calculateEmergyWithSources(const EmGraphMap& graph, const EmParams& params, EmCalcProfile& profile);
 
   /// read a graph from a file
   /// \brief read the graph in form N1 N2 split in [0.0, 1.0]
@@ -77,6 +80,8 @@ namespace tudor_emergy {
   /// \param filename a file with format: parent child branch
   /// \param inputs are a unique mapping of nodes to input flows
   void readInputArgsFromFile(const std::string& filename, EmNodeValueMap& inputs);
+
+  void readSourcedInputsFromFile(const std::string& filename, EmGraphMap& sourceinputs);
 
   /// parse a name value pair from a string
   /// \param s a string in the form "name=value"

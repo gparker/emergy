@@ -94,7 +94,7 @@ emergy_calculator : emergy.o emergy_calculator.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@
 
 odum-test	: emergy_calculator
-	./emergy_calculator test-files/odum96-figure6.8.graph.dat test-files/odum96-figure6.8.inputs.dat
+	./emergy_calculator -g test-files/odum96-figure6.8.graph.dat -i test-files/odum96-figure6.8.inputs.dat
 	@echo "Ran $@ ..."
 
 tests	: calc_emergy emergy_calculator emergy_unittest

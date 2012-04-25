@@ -17,12 +17,35 @@ Build and run tests:
 Run the calculator on test files in which we've broken up the inputs into different entries for each source in order to test aggregation:
 	
 	make odum-test
+	
+	./emergy_calculator -g test-files/odum96-figure6.8.graph.dat -i test-files/odum96-figure6.8.inputs.dat
+
+	reading graph from test-files/odum96-figure6.8.graph.dat...
+	graph: test-files/odum96-figure6.8.graph.dat
+	read 9 lines from test-files/odum96-figure6.8.graph.dat
+	reading input parameters from test-files/odum96-figure6.8.inputs.dat...
+	processed 6 node=flow pairs with total input = 30000
+	minFlow = 0
+	found 3 unique inputs
+
+	STATISTICS:
+	longest path: 4
+	complete paths: 6
+	loop violations: 9
+	flow lost to loop violations: 37500
+	minflow violations: 0
+	flow lost to minflow violations: 0
+
+	OUTPUTS:
+	output: Y = 7500
+	output: Z = 30000
+	Ran odum-test ...
 
 ## EXAMPLES
 
 ### calc_emergy
 
-The first command line calculator is a _very_ simple but usable example of a tool that uses the emergy library.
+The first command line calculator is a _very_ simple but usable example of a tool that uses the emergy library. It is entirely obsoleted by `emergy_calculator`.
 
 Here's the usage specification for `calc_emergy`:
 
@@ -74,10 +97,13 @@ cat test-files/odum96-figure6.8.inputs.dat
 A=1000 A=2000 B=3000 B=4000 C=10000 C=10000
 ```
 
-We can run the calculator on the same data as the previous example:
+We can run the calculator on the same data as the previous example (notice redundant flows will get aggegated):
 
 ```
-./emergy_calculator test-files/odum96-figure6.8.graph.dat test-files/odum96-figure6.8.inputs.dat 0.0 --print-sources
+cat test-files/odum96-figure6.8.inputs.dat
+A=1000 A=2000 B=3000 B=4000 C=10000 C=10000
+
+./emergy_calculator -g test-files/odum96-figure6.8.graph.dat -i test-files/odum96-figure6.8.inputs.dat
 
 reading graph from test-files/odum96-figure6.8.graph.dat...
 graph: test-files/odum96-figure6.8.graph.dat
@@ -85,7 +111,7 @@ read 9 lines from test-files/odum96-figure6.8.graph.dat
 reading input parameters from test-files/odum96-figure6.8.inputs.dat...
 processed 6 node=flow pairs with total input = 30000
 minFlow = 0
-found 3 unique inputs
+found 0 unique inputs
 
 STATISTICS:
 longest path: 4
@@ -96,13 +122,42 @@ minflow violations: 0
 flow lost to minflow violations: 0
 
 OUTPUTS:
-output: Y = 7500
-output: Z = 30000
+output: Y = 750
+output: Z = 3000
+```
+
+If we want to break up inputs into sources (e.g. test-files/odum96-figure6.8.sourced.inputs.dat) and add a `-p` flag to the command:
+
+```
+cat test-files/odum96-figure6.8.sourced.inputs.dat 
+S1 A=1000 B=3000 C=10000
+S2 A=2000 B=4000 C=10000
+
+./emergy_calculator -g test-files/odum96-figure6.8.graph.dat -i test-files/odum96-figure6.8.sourced.inputs.dat -p
+
+reading graph from test-files/odum96-figure6.8.graph.dat...
+graph: test-files/odum96-figure6.8.graph.dat
+read 9 lines from test-files/odum96-figure6.8.graph.dat
+Source: S1 had 3 inputs
+Source: S2 had 3 inputs
+minFlow = 0
+found 0 unique inputs
+
+STATISTICS:
+longest path: 4
+complete paths: 12
+loop violations: 18
+flow lost to loop violations: 37500
+minflow violations: 0
+flow lost to minflow violations: 0
+
+OUTPUTS:
+output: Y = 750
+output: Z = 3000
 
 OUTPUT BY SOURCE:
-A	Y=750.0000	Z=3000.0000
-B	Y=1750.0000	Z=7000.0000
-C	Y=5000.0000	Z=20000.0000
+S1	Y=250.0000	Z=1000.0000
+S2	Y=500.0000	Z=2000.0000
 ```
 
 ## REFERENCES
