@@ -109,7 +109,6 @@ int main(int argc, char **argv) {
 
   // print out parameters
   std::cerr << "minFlow = " << params.minBranchFlow << std::endl;
-  std::cerr << "found " << params.inputFlows.size() << " unique inputs" << std::endl;
 
   // save off results in this structure
   EmCalcProfile profile;
