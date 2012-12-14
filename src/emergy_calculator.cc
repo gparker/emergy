@@ -117,13 +117,15 @@ int main(int argc, char **argv) {
   calculateEmergyWithSources(graph, params, profile);
 
   // dump number of paths examined
-  std::cout << std::endl << "STATISTICS:" << std::endl;
+  std::cout << "total input Flow: " << profile.totalInputFlow << std::endl;
   std::cout << "longest path: " << profile.maxBranchFlows << std::endl;
   std::cout << "complete paths: " << profile.pathCount << std::endl;
   std::cout << "loop violations: " << profile.pathLoopCount << std::endl;
   std::cout << "flow lost to loop violations: " << profile.flowLostToLoops << std::endl;
   std::cout << "minflow violations: " << profile.pathMinflowCount << std::endl;
   std::cout << "flow lost to minflow violations: " << profile.flowLostToMinflow << std::endl;
+  std::cout << "number of visited nodes: " << profile.visitedNodes.size() << std::endl;
+  std::cout << "total output flow: " << profile.totalOutputFlow << std::endl;
 
   // dump outputs
   std::cout << std::endl << "OUTPUTS:" << std::endl;
