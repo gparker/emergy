@@ -144,7 +144,7 @@ int main(int argc, char **argv) {
   // print out the sources of emergy
   using tudor_emergy::EGM_cit;
   if (params.printSources) {
-	std::cout << std::endl << "OUTPUT BY SOURCE:" << std::endl;
+	std::cout << std::endl << "OUTPUT BY INPUT:" << std::endl;
 	for (EGM_cit cit = profile.inputOutputFlows.begin(); cit != profile.inputOutputFlows.end(); cit++) {
 	  printf("%s", cit->first.c_str());
 	  for (ENVM_cit mcit = cit->second.begin(); mcit != cit->second.end(); mcit++)
@@ -152,6 +152,14 @@ int main(int argc, char **argv) {
 	  printf("\n");
 	}
   }
+  std::cout << std::endl << "OUTPUTS BY SOURCE:" << std::endl;
+  for ( tudor_emergy::EGM_cit cit = profile.sourceOutputFlows.begin(); cit != profile.sourceOutputFlows.end(); cit++) {
+    printf("%s", cit->first.c_str());
+    for (tudor_emergy::ENVM_cit mcit = cit->second.begin(); mcit != cit->second.end(); mcit++)
+        printf("\t%s=%.4f", mcit->first.c_str(), mcit->second);
+    printf("\n");
+  }
+  
 
   exit(0);
 }
