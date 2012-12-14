@@ -116,6 +116,7 @@ namespace tudor_emergy {
   /// legacy implementation only @TODO replace with non-recursive version
   /// \note pathlist is *NOT* a reference and is passed by value
   void pathBuild(const string& node, const EmGraphMap& g, EmNodeSet& pathset, EmNodeValueMap& outputs, double flow, EmNodeList pathlist, double minflow, EmCalcProfile& profile, const EmParams& params) {
+	profile.visitedNodes.insert(node);
 	if (g.find(node) == g.end()) { // no child so aggregate flow
 	  outputs[node] += flow;
 	  if (pathset.size() > profile.maxBranchFlows)
