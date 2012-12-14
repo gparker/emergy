@@ -46,6 +46,8 @@ namespace tudor_emergy {
 	size_t pathLoopCount;
 	double flowLostToMinflow;
 	double flowLostToLoops;
+	double totalInputFlow;      /// total quantity of emergy when starting the computation
+	double totalOutputFlow;     /// total quantity of emergy at the output after computation
 	EmPathLists allPaths;		/// only populate this if requested in EmParams
 	EmNodeValueMap outputFlows;
 	EmGraphMap inputOutputFlows; /// [input => (output=value)]

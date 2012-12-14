@@ -17,7 +17,7 @@
 namespace tudor_emergy {
   const double GRAPH_SUM_MAX = 1.001; // tolerance for graph flow violations
 
-  EmCalcProfile::EmCalcProfile() : pathCount(0), maxBranchFlows(0), pathMinflowCount(0), pathLoopCount(0), flowLostToMinflow(0.0), flowLostToLoops(0.0) {
+  EmCalcProfile::EmCalcProfile() : pathCount(0), maxBranchFlows(0), pathMinflowCount(0), pathLoopCount(0), flowLostToMinflow(0.0), flowLostToLoops(0.0), totalInputFlow(0), totalOutputFlow(0) {
 	/*empty */
   }
 
@@ -164,6 +164,7 @@ namespace tudor_emergy {
 	  EmGraphMap inputOutputMap;
 	  for (ENVM_cit cit = inputs.begin(); cit != inputs.end(); cit++) {
 		EmNodeValueMap outputMap;
+		profile.totalInputFlow += cit->second;
 		pathBuild(cit->first, graph, pathSet, outputMap, cit->second, pathList, params.minBranchFlow * cit->second, profile, params);
 		if(! outputMap.empty()) {
 			inputOutputMap.insert(EmGraphMapEntry(cit->first, outputMap));
@@ -185,6 +186,7 @@ namespace tudor_emergy {
 	  		else {
 	  			outputs[ocit->first] += ocit->second;
 	  		}
+	  		profile.totalOutputFlow += ocit->second;
 	  	}
 	  }
 	}
