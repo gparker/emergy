@@ -11,6 +11,7 @@
 #include <iostream>
 #include <sstream>
 #include <cassert>
+#include <cstdlib>
 
 #include "emergy.h"
 
