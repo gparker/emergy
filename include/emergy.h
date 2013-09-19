@@ -68,7 +68,7 @@ namespace tudor_emergy {
 	double minBranchFlow;
 	EmGraphMap sourceInputFlows; /// [source => (input=value)]
 	EmNodeValueMap inputFlows;
-	EmParams() : savePaths(false), printSources(false), printInputs(false), minBranchFlow(0.0) { /* empty */ }
+	EmParams() : savePaths(false), printSources(false), printInputs(false), minBranchFlow(0.1) { /* empty */ }
   };
 
   /// calculate the emergy of a system in graph and populate a run profile
