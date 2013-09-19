@@ -28,6 +28,9 @@ namespace tudor_emergy {
   typedef map<string, EmNodeValueMap> EmGraphMap;
   typedef EmGraphMap::const_iterator EGM_cit;
   typedef pair<string, EmNodeValueMap> EmGraphMapEntry;
+  typedef map<string, EmGraphMap> EmSourceInputOutputMap;
+  typedef EmSourceInputOutputMap::const_iterator ESIOM_cit;
+  typedef pair<string, EmGraphMap> EmSourceInputOutputMapEntry;
   typedef set<string> EmNodeSet;
   typedef list<string> EmNodeList;
   typedef list<EmNodeList> EmPathLists;
@@ -43,9 +46,14 @@ namespace tudor_emergy {
 	size_t pathLoopCount;
 	double flowLostToMinflow;
 	double flowLostToLoops;
+	double totalInputFlow;      /// total quantity of emergy when starting the computation
+	double totalOutputFlow;     /// total quantity of emergy at the output after computation
+	EmNodeSet visitedNodes;     /// Set of nodes that have been visited at least once
 	EmPathLists allPaths;		/// only populate this if requested in EmParams
 	EmNodeValueMap outputFlows;
 	EmGraphMap inputOutputFlows; /// [input => (output=value)]
+  EmSourceInputOutputMap sourceInputOutputFlows; /// [source => input => (output=value)]
+  EmGraphMap sourceOutputFlows; /// [source => (output=value)]
 	EmCalcProfile();
   };
 
@@ -55,11 +63,12 @@ namespace tudor_emergy {
   /// child nodes
   struct EmParams {
 	bool savePaths;				// should all the paths be saved?
-	bool printSources;			// should sources be printed for each output?
+	bool printSources;         // should outputs be printed for each source?
+  bool printInputs;          // should outputs be printed for each input?
 	double minBranchFlow;
 	EmGraphMap sourceInputFlows; /// [source => (input=value)]
 	EmNodeValueMap inputFlows;
-	EmParams() : savePaths(false), printSources(false), minBranchFlow(0.0) { /* empty */ }
+	EmParams() : savePaths(false), printSources(false), printInputs(false), minBranchFlow(0.1) { /* empty */ }
   };
 
   /// calculate the emergy of a system in graph and populate a run profile

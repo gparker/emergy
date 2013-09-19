@@ -11,13 +11,14 @@
 #include <iostream>
 #include <sstream>
 #include <cassert>
+#include <cstdlib>
 
 #include "emergy.h"
 
 namespace tudor_emergy {
   const double GRAPH_SUM_MAX = 1.001; // tolerance for graph flow violations
 
-  EmCalcProfile::EmCalcProfile() : pathCount(0), maxBranchFlows(0), pathMinflowCount(0), pathLoopCount(0), flowLostToMinflow(0.0), flowLostToLoops(0.0) {
+  EmCalcProfile::EmCalcProfile() : pathCount(0), maxBranchFlows(0), pathMinflowCount(0), pathLoopCount(0), flowLostToMinflow(0.0), flowLostToLoops(0.0), totalInputFlow(0), totalOutputFlow(0) {
 	/*empty */
   }
 
@@ -116,6 +117,7 @@ namespace tudor_emergy {
   /// legacy implementation only @TODO replace with non-recursive version
   /// \note pathlist is *NOT* a reference and is passed by value
   void pathBuild(const string& node, const EmGraphMap& g, EmNodeSet& pathset, EmNodeValueMap& outputs, double flow, EmNodeList pathlist, double minflow, EmCalcProfile& profile, const EmParams& params) {
+	profile.visitedNodes.insert(node);
 	if (g.find(node) == g.end()) { // no child so aggregate flow
 	  outputs[node] += flow;
 	  if (pathset.size() > profile.maxBranchFlows)
@@ -153,7 +155,7 @@ namespace tudor_emergy {
   void calculateEmergyWithSources(const EmGraphMap& graph, const EmParams& params, EmCalcProfile& profile) {
 	// get the sourced inputFlows
 	const EmGraphMap& sourceInputs = params.sourceInputFlows;
-	EmGraphMap& inputOutputs = profile.inputOutputFlows;
+	EmSourceInputOutputMap& sourceInputOutputs = profile.sourceInputOutputFlows;
 	for (EGM_cit scit = sourceInputs.begin(); scit != sourceInputs.end(); scit++) {
 
 	  // process all inputs
@@ -161,22 +163,73 @@ namespace tudor_emergy {
 
 	  EmNodeSet pathSet;
 	  EmNodeList pathList;
+	  EmGraphMap inputOutputMap;
 	  for (ENVM_cit cit = inputs.begin(); cit != inputs.end(); cit++) {
 		EmNodeValueMap outputMap;
+		profile.totalInputFlow += cit->second;
 		pathBuild(cit->first, graph, pathSet, outputMap, cit->second, pathList, params.minBranchFlow * cit->second, profile, params);
-		inputOutputs.insert(EmGraphMapEntry(scit->first, outputMap));
+		if(! outputMap.empty()) {
+			inputOutputMap.insert(EmGraphMapEntry(cit->first, outputMap));
+		}
+	  }
+	  if (!inputOutputMap.empty()) {
+	  	sourceInputOutputs.insert(EmSourceInputOutputMapEntry(scit->first,inputOutputMap));
 	  }
 	}
 
-	// now aggregate all the input-output flows
+	// now aggregate all the source-input-output flows
 	EmNodeValueMap& outputs = profile.outputFlows;
-	for (EGM_cit cit = inputOutputs.begin(); cit != inputOutputs.end(); cit++)
-	  for (ENVM_cit mcit = cit->second.begin(); mcit != cit->second.end(); mcit++) {
-		if (outputs.find(mcit->first) == outputs.end())
-		  outputs.insert(*mcit);
-		else
-		  outputs[mcit->first] += mcit->second;
+	for (ESIOM_cit scit = sourceInputOutputs.begin(); scit != sourceInputOutputs.end(); scit++) {
+	  for (EGM_cit icit = scit->second.begin(); icit != scit->second.end(); icit++) {
+	  	for (ENVM_cit ocit = icit->second.begin(); ocit != icit->second.end(); ocit++) {
+	  		if (outputs.find(ocit->first) == outputs.end()) {
+	  			outputs.insert(EmNodeValue(ocit->first,0));
+	  		}
+	  		else {
+	  			outputs[ocit->first] += ocit->second;
+	  		}
+	  		profile.totalOutputFlow += ocit->second;
+	  	}
 	  }
+	}
+
+	// create source-output flows
+	EmGraphMap& sourceOutputs = profile.sourceOutputFlows;
+	for (ESIOM_cit scit = sourceInputOutputs.begin(); scit != sourceInputOutputs.end(); scit++) {
+		EmNodeValueMap outputs;
+		for (EGM_cit icit = scit->second.begin(); icit != scit->second.end(); icit++) {
+			for (ENVM_cit ocit = icit->second.begin(); ocit != icit->second.end(); ocit++) {
+				if (outputs.find(ocit->first) == outputs.end()) {
+					outputs.insert(EmNodeValue(ocit->first,ocit->second));
+				}
+				else {
+					outputs[ocit->first] += ocit->second;
+				}
+			}
+		}
+		sourceOutputs.insert(EmGraphMapEntry(scit->first, outputs));
+	}
+
+	// create input-output flows
+	EmGraphMap& inputOutputs = profile.inputOutputFlows;
+	for (ESIOM_cit scit = sourceInputOutputs.begin(); scit != sourceInputOutputs.end(); scit++) {
+		for (EGM_cit icit = scit->second.begin(); icit != scit->second.end(); icit++) {
+			if(inputOutputs.find(icit->first) == inputOutputs.end()) {
+				inputOutputs.insert(*icit);
+			}
+			else {
+				EmNodeValueMap& outputs =  inputOutputs[icit->first];
+				for (ENVM_cit ocit = icit->second.begin(); ocit != icit->second.end(); ocit++) {
+					if (outputs.find(ocit->first) == outputs.end()) {
+						outputs.insert(EmNodeValue(ocit->first,ocit->second));
+					}
+					else {
+						outputs[ocit->first] += ocit->second;
+					}
+				}
+			}
+		}
+	}
   }
 
   void calculateEmergy(const EmGraphMap& graph, const EmParams& params, EmCalcProfile& profile) {
